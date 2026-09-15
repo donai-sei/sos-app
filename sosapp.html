@@ -1,0 +1,209 @@
+<!-- ファイル名: sosapp.html (v1.0.1) -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOS位置情報送信 v1.0.1</title>
+    
+    <!-- manifest.json との連携 -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- PWA・全画面表示用の設定 -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#121212">
+
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --accent-color: #ff5252;
+            --border-color: #333333;
+            --input-bg: #2a2a2a;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 16px;
+            line-height: 1.5;
+        }
+
+        h1 {
+            font-size: 1.3rem;
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #ffffff;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .version-tag {
+            font-size: 0.8rem;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #aaa;
+        }
+
+        .section-title {
+            font-weight: bold;
+            margin-top: 16px;
+            margin-bottom: 8px;
+        }
+
+        .checkbox-group, .radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        label {
+            background-color: var(--card-bg);
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        input[type="checkbox"], input[type="radio"] {
+            accent-color: var(--accent-color);
+            width: 18px;
+            height: 18px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 80px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 8px;
+            box-sizing: border-box;
+            font-size: 0.95rem;
+            resize: vertical;
+        }
+
+        button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 6px;
+            width: 100%;
+            cursor: pointer;
+            margin-top: 12px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        button:active {
+            opacity: 0.8;
+        }
+
+        .result-label {
+            color: var(--accent-color);
+            font-weight: bold;
+            margin-top: 16px;
+            margin-bottom: 8px;
+        }
+
+        #outputData {
+            background-color: #000000;
+            color: #00ff66;
+            font-family: monospace;
+            border: 1px solid #004411;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>
+        <span>SOS位置情報送信</span>
+        <span class="version-tag">v1.0.1</span>
+    </h1>
+
+    <div class="section-title">▼ ケガの具合は？（複数選択可）</div>
+    <div class="checkbox-group">
+        <label><input type="checkbox" name="condition" value="道迷いのみで無傷"> 道迷いのみで無傷</label>
+        <label><input type="checkbox" name="condition" value="ケガは有るが自分で歩ける"> ケガは有るが自分で歩ける</label>
+        <label><input type="checkbox" name="condition" value="ケガ有り自分で歩けない"> ケガ有り自分で歩けない</label>
+        <label><input type="checkbox" name="condition" value="骨折していて皮膚から骨が出てる"> 骨折していて皮膚から骨が出てる</label>
+        <label><input type="checkbox" name="condition" value="大量出血してる"> 大量出血してる</label>
+    </div>
+
+    <div class="section-title">▼ 症状の補足（必要な場合）</div>
+    <textarea id="supplementInput" placeholder="詳細な状況があれば入力してください"></textarea>
+
+    <div class="section-title">▼ 今の人数</div>
+    <div class="radio-group">
+        <label><input type="radio" name="members" value="1名" checked> 1名</label>
+        <label><input type="radio" name="members" value="2名"> 2名</label>
+        <label><input type="radio" name="members" value="3名"> 3名</label>
+    </div>
+
+    <button type="button" id="getLocBtn">位置情報を取得する</button>
+
+    <div class="result-label">【生成された送信データ】</div>
+    <textarea id="outputData" readonly></textarea>
+
+    <script>
+        document.getElementById('getLocBtn').addEventListener('click', () => {
+            const output = document.getElementById('outputData');
+            output.value = "位置情報を取得中...";
+
+            // 選択された「ケガの具合」を取得
+            const conditions = [];
+            document.querySelectorAll('input[name="condition"]:checked').forEach(cb => {
+                conditions.push(cb.value);
+            });
+
+            // 補足コメントを取得
+            const supplement = document.getElementById('supplementInput').value.trim();
+
+            // 選択された「人数」を取得
+            const members = document.querySelector('input[name="members"]:checked')?.value || "不明";
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        
+                        let text = `[SOS位置情報]\n`;
+                        text += `状況: ${conditions.length > 0 ? conditions.join(', ') : '選択なし'}\n`;
+                        if (supplement) text += `補足: ${supplement}\n`;
+                        text += `人数: ${members}\n`;
+                        text += `位置: Lat ${lat}, Lng ${lng}\n`;
+                        text += `https://maps.google.com/?q=${lat},${lng}`;
+
+                        output.value = text;
+                    },
+                    (error) => {
+                        output.value = `位置情報の取得に失敗しました: ${error.message}`;
+                    },
+                    { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+                );
+            } else {
+                output.value = "お使いの端末は位置情報に対応していません。";
+            }
+        });
+    </script>
+</body>
+</html>

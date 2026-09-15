@@ -1,0 +1,21 @@
+{
+  "name": "SOS位置情報送信システム",
+  "short_name": "SOS位置情報",
+  "start_url": "./sosapp.html",
+  "display": "standalone",
+  "background_color": "#121212",
+  "theme_color": "#121212",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192/ff5252/ffffff?text=SOS",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://via.placeholder.com/512/ff5252/ffffff?text=SOS",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
