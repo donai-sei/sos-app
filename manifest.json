@@ -1,6 +1,7 @@
 {
   "name": "SOS位置情報送信システム",
   "short_name": "SOS位置情報",
+  "description": "オフライン環境でGPS位置情報を取得するSOSアプリ",
   "start_url": "./sosapp.html",
   "display": "standalone",
   "background_color": "#121212",
@@ -8,14 +9,16 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "https://via.placeholder.com/192/ff5252/ffffff?text=SOS",
+      "src": "https://pwa-builder-html-plugin.azurewebsites.net/assets/icons/icon_192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "https://via.placeholder.com/512/ff5252/ffffff?text=SOS",
+      "src": "https://pwa-builder-html-plugin.azurewebsites.net/assets/icons/icon_512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     }
   ]
 }
